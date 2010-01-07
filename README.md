@@ -1,11 +1,8 @@
 #JukeboxAPI
 
 **URL:**      		/albums.json
-
 **Method:**      	GET
-
 **Params:**
-				
 **Description:**
 
 **URL:**	      	/albums/:id/tracks.json
