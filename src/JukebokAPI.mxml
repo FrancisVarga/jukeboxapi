@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/halo" minWidth="1024" minHeight="768"
+			   creationComplete="application1_creationCompleteHandler(event)" xmlns:flexui="flexunit.flexui.*">
+	<fx:Script>
+		<![CDATA[
+			import cc.varga.api.jukebox.JukeboxAPIEvent;
+			import cc.varga.api.jukebox.JukeboxAPI;
+			import mx.events.FlexEvent;
+
+			protected function application1_creationCompleteHandler(event:FlexEvent):void
+			{
+				JukeboxAPI.HOST = "http://aludose/";
+				var service : JukeboxAPI = new JukeboxAPI();
+				service.addEventListener(JukeboxAPIEvent.ARTISTLIST_COMPLETE, onArtistListComplete);
+				service.addEventListener(JukeboxAPIEvent.BLIP_FEED_RESULT, onBlipFeedResult);
+				
+				service.search({query:"Hallo"});
+				
+			}
+			
+			private function onArtistListComplete(event : JukeboxAPIEvent):void{
+				
+			}
+			
+			private function onBlipFeedResult(evetn : JukeboxAPIEvent):void{
+				
+			}
+
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<flexui:TestRunnerBase id="testrunner" />
+	
+</s:Application>
+ 
