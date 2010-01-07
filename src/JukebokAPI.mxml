@@ -2,9 +2,11 @@
 <s:Application xmlns:fx="http://ns.adobe.com/mxml/2009" 
 			   xmlns:s="library://ns.adobe.com/flex/spark" 
 			   xmlns:mx="library://ns.adobe.com/flex/halo" minWidth="1024" minHeight="768"
-			   creationComplete="application1_creationCompleteHandler(event)" xmlns:flexui="flexunit.flexui.*">
+			   creationComplete="application1_creationCompleteHandler(event)" 
+			   xmlns:flexui="flexunit.flexui.*" >
 	<fx:Script>
 		<![CDATA[
+			import mx.rpc.events.FaultEvent;
 			import cc.varga.api.jukebox.JukeboxAPIEvent;
 			import cc.varga.api.jukebox.JukeboxAPI;
 			import mx.events.FlexEvent;
@@ -15,17 +17,35 @@
 				var service : JukeboxAPI = new JukeboxAPI();
 				service.addEventListener(JukeboxAPIEvent.ARTISTLIST_COMPLETE, onArtistListComplete);
 				service.addEventListener(JukeboxAPIEvent.BLIP_FEED_RESULT, onBlipFeedResult);
+				service.addEventListener(JukeboxAPIEvent.ALBUMLIST_COMPLETE, onAlbumlistComplete);
+				service.addEventListener(JukeboxAPIEvent.SEARCH_RESULT, onSearchResult);
+				service.addEventListener(JukeboxAPIEvent.FAULT,onFault);
 				
 				service.search({query:"Hallo"});
+				service.getAlbumsList();
+				service.getArtistList();
+				service.loadBlipFMFeed("LittleBuddha87");
 				
+			}
+			
+			private function onSearchResult(event : JukeboxAPIEvent):void{
+				trace("onSearchResult: " + event.result);
+			}
+			
+			private function onFault(event : JukeboxAPIEvent):void{
+				trace(event.fault.message);
+			}
+			
+			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
+				trace("onAlbumlistComplete: " + event.result);
 			}
 			
 			private function onArtistListComplete(event : JukeboxAPIEvent):void{
-				
+				trace("onArtistListComplete" + event.result);	
 			}
 			
-			private function onBlipFeedResult(evetn : JukeboxAPIEvent):void{
-				
+			private function onBlipFeedResult(event : JukeboxAPIEvent):void{
+				trace("onBlipFeedResult" + event.result);
 			}
 
 		]]>
@@ -34,8 +54,6 @@
 	<fx:Declarations>
 		<!-- Place non-visual elements (e.g., services, value objects) here -->
 	</fx:Declarations>
-	
-	<flexui:TestRunnerBase id="testrunner" />
 	
 </s:Application>
  

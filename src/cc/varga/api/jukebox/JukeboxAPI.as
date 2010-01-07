@@ -5,6 +5,7 @@ package cc.varga.api.jukebox
 	import flash.events.EventDispatcher;
 	import mx.rpc.http.mxml.HTTPService;
 	import com.adobe.serialization.json.JSON;
+	import mx.messaging.channels.StreamingAMFChannel;
 
 	[ Event( name="artistlist_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="search_result", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
@@ -71,7 +72,7 @@ package cc.varga.api.jukebox
 			httpService.addEventListener(ResultEvent.RESULT, onArtistResult);
 			httpService.addEventListener(FaultEvent.FAULT, onArtistFault);
 			httpService.method = "POST";
-			httpService.url = HOST + "/web/artists.json";
+			httpService.url = HOST + "web/artists.json";
 			httpService.send();
 			
 		}
@@ -100,18 +101,29 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		public function getArtistList():void{
 			var httpService : HTTPService = new HTTPService();
-			httpService.addEventListener(ResultEvent.RESULT, onArtistResult);
-			httpService.addEventListener(FaultEvent.FAULT, onArtistFault);
-			httpService.method = "POST";
-			httpService.url = HOST + "/web/artists.json";
+			httpService.addEventListener(ResultEvent.RESULT, onArtistsListResult);
+			httpService.addEventListener(FaultEvent.FAULT, onArtistsListFault);
+			httpService.method = "GET";
+			httpService.url = HOST + "web/artists.json";
 			httpService.send();	
 		}
 		
 		private function onArtistsListResult(event : ResultEvent):void{
 			
+			var result : Object = JSON.decode(event.result as String);
+			var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(JukeboxAPIEvent.ARTISTLIST_COMPLETE);
+			jukeEvent.result = result;
+			
+			dispatchEvent(jukeEvent);
+			
 		}
 		
 		private function onArtistsListFault(event : FaultEvent):void{
+		
+			var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(JukeboxAPIEvent.FAULT);
+			jukeEvent.fault = event;
+			
+			dispatchEvent(jukeEvent);
 			
 		}
 		
@@ -120,10 +132,10 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		public function loadBlipFMFeed(nickName : String):void{
 			var httpService : HTTPService = new HTTPService();
-			httpService.addEventListener(ResultEvent.RESULT, onArtistResult);
-			httpService.addEventListener(FaultEvent.FAULT, onArtistFault);
-			httpService.method = "POST";
-			httpService.url = HOST + "/web/blip/" + nickName + ".json";
+			httpService.addEventListener(ResultEvent.RESULT, onBlipFMResult);
+			httpService.addEventListener(FaultEvent.FAULT, onBlipFMFault);
+			httpService.method = "GET";
+			httpService.url = HOST + "web/blip/" + nickName + ".json";
 			httpService.send();	
 		}
 		
@@ -150,7 +162,7 @@ package cc.varga.api.jukebox
 		public function getAlbumsList():void{
 			
 			var httpService : HTTPService = new HTTPService();
-			httpService.url = HOST + "albums.json";
+			httpService.url = HOST + "web/albums.json";
 			httpService.method = "GET";
 			httpService.addEventListener(ResultEvent.RESULT, onAlbumListResult);
 			httpService.addEventListener(FaultEvent.FAULT, onAlbumListFault);
