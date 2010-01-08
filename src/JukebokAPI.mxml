@@ -20,12 +20,18 @@
 				service.addEventListener(JukeboxAPIEvent.ALBUMLIST_COMPLETE, onAlbumlistComplete);
 				service.addEventListener(JukeboxAPIEvent.SEARCH_RESULT, onSearchResult);
 				service.addEventListener(JukeboxAPIEvent.FAULT,onFault);
+				service.addEventListener(JukeboxAPIEvent.ALBUM_TRACKS_COMPLETE, onTracksComplete);
 				
 				service.search({query:"Hallo"});
 				service.getAlbumsList();
 				service.getArtistList();
 				service.loadBlipFMFeed("LittleBuddha87");
+				service.getAlbumByID("a5c791947a0c67aef5d9b79c03ff5b9a");
 				
+			}
+			
+			private function onTracksComplete(event : JukeboxAPIEvent):void{
+				trace("onTracksComplete: " + event.result);
 			}
 			
 			private function onSearchResult(event : JukeboxAPIEvent):void{
