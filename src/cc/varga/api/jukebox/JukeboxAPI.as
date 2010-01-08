@@ -67,8 +67,14 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function saveCollections(collecObj : Object):void{ createHTTPService("web/collections", onSavedCollection, collecObj, "POST"); }
+		public function saveCollection(collecObj : Object):void{ createHTTPService("web/collections", onSavedCollection, collecObj, "POST"); }
 		private function onSavedCollection(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.COLLECTION_SAVED, event.result); }
+		
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		public function updateCollection(collecObj : Object):void{ createHTTPService("web/collections/" + collecObj["_id"], onUpdateConllectionResult, collecObj, "PUT"); }
+		private function onUpdateConllectionResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.UPDATE_COLLECTION_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
@@ -77,29 +83,34 @@ package cc.varga.api.jukebox
 		private function onGetCollectionByIDResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ALBUM_TRACKS_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//
+		// Default Fault Event
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		private function onFault(event : FaultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.FAULT, null, event); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//donwloadObj : jsonObject -> doc only the json object
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		public function download(downloadObj:Object):void{ createHTTPService("web/downloader/", onDownloadResult, downloadObj, "POST");	}
+		private function onDownloadResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.DOWNLAD_COMPLETE, event.result); }
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		private function createHTTPService(url:String, resultFunction:Function, params:Object = null, method:String = "GET"){
+			
 			var service : HTTPService = new HTTPService();
 			service.url = HOST + url;
 			service.addEventListener(FaultEvent.FAULT, onFault);
 			service.addEventListener(ResultEvent.RESULT, resultFunction);
 			service.method = method;
+			
 			if(params) service.send(params);
 			else service.send();
+			
 		}
 		
-		private function decodeJSON(result:*):Object{
-			return JSON.decode(result);
-		}
+		private function decodeJSON(result:*):Object{ return JSON.decode(result); }
 		
 		private function dispatchJukeEvent(type:String, result:* = null, fault:* = null):void{
-			
 			var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(type);
 			
 			if(result) jukeEvent.result = decodeJSON(result);
