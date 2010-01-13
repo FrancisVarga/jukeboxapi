@@ -95,10 +95,11 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		private function createHTTPService(url:String, resultFunction:Function, params:Object = null, method:String = "GET"){
+		private function createHTTPService(url:String, resultFunction:Function, params:Object = null, method:String = "GET"):void{
 			
 			var service : HTTPService = new HTTPService();
 			service.url = HOST + url;
+			service.resultFormat = "text";
 			service.addEventListener(FaultEvent.FAULT, onFault);
 			service.addEventListener(ResultEvent.RESULT, resultFunction);
 			service.method = method;
@@ -108,9 +109,14 @@ package cc.varga.api.jukebox
 			
 		}
 		
-		private function decodeJSON(result:*):Object{ return JSON.decode(result); }
+		private function decodeJSON(result:*):JukeboxAPIObject
+		{ 
+			var jsonObj : JukeboxAPIObject = JukeboxAPIObject(JSON.decode(result));			
+			return  jsonObj;
+		}
 		
-		private function dispatchJukeEvent(type:String, result:* = null, fault:* = null):void{
+		private function dispatchJukeEvent(type:String, result:* = null, fault:* = null):void
+		{
 			var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(type);
 			
 			if(result) jukeEvent.result = decodeJSON(result);
