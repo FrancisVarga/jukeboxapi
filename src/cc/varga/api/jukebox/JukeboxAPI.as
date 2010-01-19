@@ -5,6 +5,8 @@ package cc.varga.api.jukebox
 	import flash.events.EventDispatcher;
 	import mx.rpc.http.mxml.HTTPService;
 	import com.adobe.serialization.json.JSON;
+	import mx.utils.ObjectProxy;
+	import mx.controls.Alert;
 
 	[ Event( name="artistlist_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="search_result", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
@@ -31,55 +33,55 @@ package cc.varga.api.jukebox
 		//
 		//example: {query:SearchString}
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function search(query:Object):void{ createHTTPService("web/search.json", onSearchResult, query, "POST"); }
+		public function search(query:Object):void{ createHTTPService("search.json", onSearchResult, query, "POST"); }
 		private function onSearchResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.SEARCH_RESULT, event.result, null); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function getArtist(artistID:String):void{ createHTTPService("web/artists.json", onArtistResult); }
+		public function getArtist(artistID:String):void{ createHTTPService("artists.json", onArtistResult); }
 		private function onArtistResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ARTIST_COMPLETE, event.result, null); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function getArtistList():void{ createHTTPService("web/artists.json", onArtistsListResult); }
+		public function getArtistList():void{ createHTTPService("artists.json", onArtistsListResult); }
 		private function onArtistsListResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ARTISTLIST_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function loadBlipFMFeed(nickName : String):void{ createHTTPService("web/blip/" + nickName + ".json", onBlipFMResult); }
+		public function loadBlipFMFeed(nickName : String):void{ createHTTPService("blip/" + nickName + ".json", onBlipFMResult); }
 		private function onBlipFMResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.BLIP_FEED_RESULT, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function getAlbumsList():void{ createHTTPService("web/albums.json", onAlbumListResult); }		
+		public function getAlbumsList():void{ createHTTPService("albums.json", onAlbumListResult); }		
 		private function onAlbumListResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ALBUMLIST_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function getAlbumByID(id:String):void{ createHTTPService("web/albums/" + id + "/tracks.json", onGetAlbumByIDResult); }
+		public function getAlbumByID(id:String):void{ createHTTPService("albums/" + id + "/tracks.json", onGetAlbumByIDResult); }
 		private function onGetAlbumByIDResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ALBUM_TRACKS_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function saveCollection(collecObj : Object):void{ createHTTPService("web/collections", onSavedCollection, collecObj, "POST"); }
+		public function saveCollection(collecObj : Object):void{ createHTTPService("collections", onSavedCollection, collecObj, "POST"); }
 		private function onSavedCollection(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.COLLECTION_SAVED, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function updateCollection(collecObj : Object):void{ createHTTPService("web/collections/" + collecObj["_id"], onUpdateConllectionResult, collecObj, "PUT"); }
+		public function updateCollection(collecObj : Object):void{ createHTTPService("collections/" + collecObj["_id"], onUpdateConllectionResult, collecObj, "PUT"); }
 		private function onUpdateConllectionResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.UPDATE_COLLECTION_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function getCollectionByID(collectionID:String):void{ createHTTPService("web/collections/"+collectionID+"/tracks.json", onGetCollectionByIDResult); }
+		public function getCollectionByID(collectionID:String):void{ createHTTPService("collections/"+collectionID+"/tracks.json", onGetCollectionByIDResult); }
 		private function onGetCollectionByIDResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ALBUM_TRACKS_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -90,7 +92,7 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//donwloadObj : jsonObject -> doc only the json object
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function download(downloadObj:Object):void{ createHTTPService("web/downloader/", onDownloadResult, downloadObj, "POST");	}
+		public function download(downloadObj:Object):void{ createHTTPService("downloader/", onDownloadResult, downloadObj, "POST");	}
 		private function onDownloadResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.DOWNLAD_COMPLETE, event.result); }
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
@@ -109,15 +111,41 @@ package cc.varga.api.jukebox
 			
 		}
 		
-		private function decodeJSON(result:*):JukeboxAPIObject
-		{ 
-			var jsonObj : JukeboxAPIObject = JukeboxAPIObject(JSON.decode(result));			
-			return  jsonObj;
+		private function decodeJSON(result:*):*
+		{ 			
+			var resultObj : Object = JSON.decode(result);
+			var arryList : Array = new Array();
+			for(var i:uint=0; i < resultObj.length; i++){
+				arryList.unshift(new JukeboxAPIObject(resultObj[i]));
+			}
+			return arryList;
+		}
+		
+		private static const SEARCH_URL : String = "search";
+		private static const DOWNLOAD_URL : String = "download";
+		
+		private function generateURL(urlType:String):String{
+			switch(urlType){
+				case SEARCH_URL :
+					break;
+					return "";
+				case DOWNLOAD_URL : 
+					break;
+					return "";
+				default : 
+					return "";
+					break;
+			};
 		}
 		
 		private function dispatchJukeEvent(type:String, result:* = null, fault:* = null):void
 		{
 			var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(type);
+			
+			var o1:Object = { f1:"aaa", f2:123 };
+			var o2:Object = new ObjectProxy(o1);
+			var o3:Object = ObjectProxy(o2).object;
+			trace("Real object: "+o3);
 			
 			if(result) jukeEvent.result = decodeJSON(result);
 			else jukeEvent.fault = fault;

@@ -1,9 +1,11 @@
 package cc.varga.api.jukebox
 {
-	import flash.utils.Dictionary;
-
-	public dynamic class JukeboxAPIObject extends Dictionary
+	import mx.utils.object_proxy;
+	import mx.utils.ObjectProxy;
+	
+	public dynamic class JukeboxAPIObject extends ObjectProxy
 	{
-		public function JukeboxAPIObject(){}
+		public function JukeboxAPIObject(item:*){super(item);}
 	}
+	
 }
