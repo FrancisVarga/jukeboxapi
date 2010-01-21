@@ -15,6 +15,7 @@ package cc.varga.api.jukebox
 		public static const ALBUM_TRACKS_COMPLETE : String = "album_tracks_complete";
 		public static const UPDATE_COLLECTION_COMPLETE : String = "update_collection_complete";
 		public static const DOWNLAD_COMPLETE : String = "donwload_complete";
+		public static const COLLECTION_CREATED : String = "collection_create";
 		public var result : *;
 		public var fault : *;
 		

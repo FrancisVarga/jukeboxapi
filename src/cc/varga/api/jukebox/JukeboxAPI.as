@@ -1,19 +1,22 @@
 package cc.varga.api.jukebox
 {
-	import mx.rpc.events.ResultEvent;
-	import mx.rpc.events.FaultEvent;
-	import flash.events.EventDispatcher;
-	import mx.rpc.http.mxml.HTTPService;
 	import com.adobe.serialization.json.JSON;
-	import mx.utils.ObjectProxy;
+	
+	import flash.events.EventDispatcher;
+	
 	import mx.controls.Alert;
+	import mx.rpc.events.FaultEvent;
+	import mx.rpc.events.ResultEvent;
+	import mx.rpc.http.mxml.HTTPService;
+	import mx.utils.ObjectProxy;
 
 	[ Event( name="artistlist_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="search_result", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="blip_feed_result", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="albumlist_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="fault", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
-	[ Event( name="album_tracks_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ] 
+	[ Event( name="album_tracks_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
+	[ Event( name="collection_create", type="cc.varga.api.jukebox.JukeboxAPIEvent") ] 
 	public class JukeboxAPI extends EventDispatcher
 	{
 		
@@ -69,6 +72,11 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		public function createCollection():void{ createHTTPService("/collections.json", onCreateCollection); }
+		private function onCreateCollection(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.COLLECTION_SAVED, event.result); }
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		public function saveCollection(collecObj : Object):void{ createHTTPService("collections", onSavedCollection, collecObj, "POST"); }
 		private function onSavedCollection(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.COLLECTION_SAVED, event.result); }
 		
@@ -116,7 +124,7 @@ package cc.varga.api.jukebox
 			var resultObj : Object = JSON.decode(result);
 			var arryList : Array = new Array();
 			for(var i:uint=0; i < resultObj.length; i++){
-				arryList.unshift(new JukeboxAPIObject(resultObj[i]));
+				arryList.push(new JukeboxAPIObject(resultObj[i]));
 			}
 			return arryList;
 		}
@@ -136,16 +144,12 @@ package cc.varga.api.jukebox
 					return "";
 					break;
 			};
+			return "";
 		}
 		
 		private function dispatchJukeEvent(type:String, result:* = null, fault:* = null):void
 		{
 			var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(type);
-			
-			var o1:Object = { f1:"aaa", f2:123 };
-			var o2:Object = new ObjectProxy(o1);
-			var o3:Object = ObjectProxy(o2).object;
-			trace("Real object: "+o3);
 			
 			if(result) jukeEvent.result = decodeJSON(result);
 			else jukeEvent.fault = fault;
