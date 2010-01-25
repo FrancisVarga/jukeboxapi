@@ -1,14 +1,17 @@
 package cc.varga.api.jukebox
 {
+	import cc.varga.utils.Logger;
+	
 	import com.adobe.serialization.json.JSON;
 	
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
+	import flash.net.*;
 	
-	import mx.controls.Alert;
 	import mx.rpc.events.FaultEvent;
 	import mx.rpc.events.ResultEvent;
 	import mx.rpc.http.mxml.HTTPService;
-	import mx.utils.ObjectProxy;
 
 	[ Event( name="artistlist_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="search_result", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
@@ -72,8 +75,8 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		public function createCollection():void{ createHTTPService("/collections.json", onCreateCollection); }
-		private function onCreateCollection(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.COLLECTION_SAVED, event.result); }
+		public function createCollection(paramObj:Object):void{ createHTTPService("collections.json", onCreateCollection, JSON.encode(paramObj), "POST"); }
+		private function onCreateCollection(event : Event):void{ dispatchJukeEvent(JukeboxAPIEvent.COLLECTION_SAVED, event.toString()); }
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -93,9 +96,10 @@ package cc.varga.api.jukebox
 		private function onGetCollectionByIDResult(event : ResultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.ALBUM_TRACKS_COMPLETE, event.result); }
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// Default Fault Event
+		// Default Fault/IOError Event
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		private function onFault(event : FaultEvent):void{ dispatchJukeEvent(JukeboxAPIEvent.FAULT, null, event); }
+		private function onIOError(event : IOErrorEvent):void{}
 		
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//donwloadObj : jsonObject -> doc only the json object
@@ -105,17 +109,42 @@ package cc.varga.api.jukebox
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 		//
 		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		private function createHTTPService(url:String, resultFunction:Function, params:Object = null, method:String = "GET"):void{
+		private function createHTTPService(url:String, resultFunction:Function, params:* = null, method:String = "GET"):void{
+			
+			Logger.log("Create HTTPService:" + method + " || params: " + params, "");
 			
 			var service : HTTPService = new HTTPService();
 			service.url = HOST + url;
-			service.resultFormat = "text";
 			service.addEventListener(FaultEvent.FAULT, onFault);
 			service.addEventListener(ResultEvent.RESULT, resultFunction);
 			service.method = method;
 			
-			if(params) service.send(params);
-			else service.send();
+			if(params is Object){
+				Logger.log("Create HTTPService with params", "");
+				service.send(params);
+			} else if( params is String){
+				Logger.log("Create URLOADER with params: " + params, "");
+				var basicService : URLLoader = new URLLoader();	
+				basicService.data = params;
+				basicService.addEventListener(Event.COMPLETE, resultFunction);
+				basicService.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				var request : URLRequest = new URLRequest(HOST + url);
+				request.method = method;
+				basicService.load(request);
+			} else {
+				Logger.log("Create HTTPService without params", "");
+				service.send();
+			}
+			
+			/*else if (bodyObj) {
+				Logger.log("Create URLOADER with params: " + bodyObj, "");
+				var basicService : URLLoader = new URLLoader();	
+				basicService.data = bodyObj;
+				basicService.addEventListener(Event.COMPLETE, resultFunction);
+				basicService.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
+				var request : URLRequest = new URLRequest(HOST + url);
+				request.method = method;
+				basicService.load(request);*/
 			
 		}
 		
@@ -126,6 +155,7 @@ package cc.varga.api.jukebox
 			for(var i:uint=0; i < resultObj.length; i++){
 				arryList.push(new JukeboxAPIObject(resultObj[i]));
 			}
+			
 			return arryList;
 		}
 		
