@@ -1,8 +1,11 @@
 package cc.varga.api.jukebox {
-  public class Resource extends EventDispatcher {
+  import com.adobe.serialization.json.JSON;
+
+public class Resource extends EventDispatcher {
+
 
     public static function create(object:Object, klass:String) : void {
-      createHTTPService(klass+".json", createComplete, JSON.encode(object), "POST");  
+      request(klass+".json", createComplete, JSON.encode(object), "POST");  
     }
 
     private function createComplete(event : Event) : void {
@@ -25,8 +28,7 @@ package cc.varga.api.jukebox {
     private function onIOError(event : IOErrorEvent) : void {
     }
 
-    private function createHTTPService(url:String, resultFunction:Function, params:* = null, method:String = "GET"):void{
-      Logger.log("Create URLOADER with params: " + params, "");
+    private static function request(url:String, resultFunction:Function, params:* = null, method:String = "GET"):void{
       var basicService : URLLoader = new URLLoader();	
       basicService.data = params;
       basicService.addEventListener(Event.COMPLETE, resultFunction);
