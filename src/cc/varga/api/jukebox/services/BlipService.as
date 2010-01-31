@@ -7,7 +7,7 @@ package cc.varga.api.jukebox.services
 			super();
 		}
 		
-		override public function get_request(vo:JukeboxAPIVO) : void{
+		override public function get(vo:JukeboxAPIVO) : void {
 			
 		}
 		

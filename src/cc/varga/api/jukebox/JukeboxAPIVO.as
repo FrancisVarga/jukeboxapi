@@ -13,6 +13,7 @@ package cc.varga.api.jukebox
 		public var url : String;
 		public var type : String;
 		public var params : Object;
+    public var data : Object;
 		
 		public function JukeboxAPIVO(item:Object=null, uid:String=null, proxyDepth:int=-1)
 		{
