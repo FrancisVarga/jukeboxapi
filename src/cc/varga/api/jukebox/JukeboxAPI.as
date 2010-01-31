@@ -20,7 +20,7 @@ package cc.varga.api.jukebox
 	[ Event( name="fault", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="album_tracks_complete", type="cc.varga.api.jukebox.JukeboxAPIEvent") ]
 	[ Event( name="collection_create", type="cc.varga.api.jukebox.JukeboxAPIEvent") ] 
-	public class JukeboxAPI extends EventDispatcher
+	internal class JukeboxAPI extends EventDispatcher
 	{
 		
 		private var _currentHost:String;	
