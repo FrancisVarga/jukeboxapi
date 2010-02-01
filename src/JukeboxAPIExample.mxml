@@ -9,59 +9,57 @@
 			import com.adobe.serialization.json.JSON;
 			import mx.rpc.events.FaultEvent;
 			import cc.varga.api.jukebox.JukeboxAPIEvent;
-			import cc.varga.api.jukebox.JukeboxAPI;
+			import cc.varga.api.jukebox.JukeboxAPIVO;
+			import cc.varga.api.jukebox.services.JukeboxService;
+			import cc.varga.api.jukebox.*;
+			import cc.varga.utils.Logger;
 			import mx.events.FlexEvent;
 
-			private var service : JukeboxAPI;
+			private var service : JukeboxService;
 			
 			protected function application1_creationCompleteHandler(event:FlexEvent):void
 			{
-				JukeboxAPI.HOST = "http://aludose/";
-				
-				service = new JukeboxAPI();
-      //	service.addEventListener(JukeboxAPIEvent.ARTISTLIST_COMPLETE, onArtistListComplete);
-			//	service.addEventListener(JukeboxAPIEvent.BLIP_FEED_RESULT, onBlipFeedResult);
-			//	service.addEventListener(JukeboxAPIEvent.ALBUMLIST_COMPLETE, onAlbumlistComplete);
-			//	service.addEventListener(JukeboxAPIEvent.SEARCH_RESULT, onSearchResult);
-			//	service.addEventListener(JukeboxAPIEvent.FAULT,onFault);
-			//	service.addEventListener(JukeboxAPIEvent.ALBUM_TRACKS_COMPLETE, onTracksComplete);
-			//	service.addEventListener(JukeboxAPIEvent.DOWNLAD_COMPLETE, onDownloadComplete);
-			//	
-			//	service.search({query:"Hallo"});
-			//	service.getAlbumsList();
-			//	service.getArtistList();
-			//	service.loadBlipFMFeed("LittleBuddha87");
-			//	service.getAlbumByID("a5c791947a0c67aef5d9b79c03ff5b9a");
-				
+        var vo:JukeboxAPIVO = new JukeboxAPIVO();
+        vo.path = ["blipfm"];
+        vo.type = JukeboxAPIVO.BLIP_TYPE;
+
+        var blip:IRESTful = JukeboxService.createService(vo);
+        blip.addEventListener(JukeboxAPIEvent.FETCH_COMPLETE, onBlipFeedResult);
+        blip.addEventListener(JukeboxAPIEvent.FAULT, onFault);
+        blip.fetch(); 
 			}
 			
-			private function onDownloadComplete(event : JukeboxAPIEvent):void{
-				trace("onDownloadComplete" + event.result);
-			}
-			
-			private function onTracksComplete(event : JukeboxAPIEvent):void{
-				trace("onTracksComplete: " + event.result);
-			}
-			
-			private function onSearchResult(event : JukeboxAPIEvent):void{
-				trace("onSearchResult: " + event.result);
-			}
-			
-			private function onFault(event : JukeboxAPIEvent):void{
-				trace(event.fault.message);
-			}
-			
-			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
-				trace("onAlbumlistComplete: " + event.result);
-			}
-			
-			private function onArtistListComplete(event : JukeboxAPIEvent):void{
-				trace("onArtistListComplete" + event.result);	
-			}
+//			private function onDownloadComplete(event : JukeboxAPIEvent):void{
+//				trace("onDownloadComplete" + event.result);
+//			}
+//			
+//			private function onTracksComplete(event : JukeboxAPIEvent):void{
+//				trace("onTracksComplete: " + event.result);
+//			}
+//			
+//			private function onSearchResult(event : JukeboxAPIEvent):void{
+//				trace("onSearchResult: " + event.result);
+//			}
+//			
+//			private function onFault(event : JukeboxAPIEvent):void{
+//				trace(event.fault.message);
+//			}
+//			
+//			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
+//				trace("onAlbumlistComplete: " + event.result);
+//			}
+//			
+//			private function onArtistListComplete(event : JukeboxAPIEvent):void{
+//				trace("onArtistListComplete" + event.result);	
+//			}
 			
 			private function onBlipFeedResult(event : JukeboxAPIEvent):void{
-				trace("onBlipFeedResult" + event.result);
-      //	service.download({doc:JSON.encode(event.result[0])});
+        var vo:JukeboxAPIVO = event.result as JukeboxAPIVO;
+				trace("onBlipFeedResult" + vo.data);
+        for (var i:int = 0; i < vo.data.length; i++) {
+          Logger.log((vo.data[i] as JukeboxAPIObject).title,"Blip");
+          
+        }
 			}
 
 		]]>

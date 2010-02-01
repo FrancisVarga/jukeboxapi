@@ -1,23 +1,24 @@
 package cc.varga.api.jukebox.services
 {
-	public class SearchService extends AbstractService
+	internal class SearchService extends AbstractService
 	{
-		public function SearchService()
+		public function SearchService(vo:JukeboxAPIVO)
 		{
-			super();
+      vo.type = JukeboxAPIVO.SEARCH_TYPE;
+			super(vo);
 		}
 		
-		override public function delete_request(vo:JukeboxAPIVO) : void{
-			
-		}
-		
-		override public function get_request(vo:JukeboxAPIVO) : void{
-			
-		}
-		
-		override public function post_request(vo:JukeboxAPIVO) : void{
-				
-		}
+//		override public function delete_request(vo:JukeboxAPIVO) : void{
+//			
+//		}
+//		
+//		override public function get_request(vo:JukeboxAPIVO) : void{
+//			
+//		}
+//		
+//		override public function post_request(vo:JukeboxAPIVO) : void{
+//				
+//		}
 		
 	}
 }

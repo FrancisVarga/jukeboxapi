@@ -1,19 +1,21 @@
 package cc.varga.api.jukebox.services
 {
-	public class BlipService extends AbstractService
+  import cc.varga.api.jukebox.*;
+  internal class BlipService extends AbstractService
 	{
-		public function BlipService()
+		public function BlipService(vo:JukeboxAPIVO)
 		{
-			super();
+      vo.type = JukeboxAPIVO.BLIP_TYPE
+			super(vo);
 		}
 		
-		override public function get(vo:JukeboxAPIVO) : void {
-			
-		}
+//		override public function get() : void{
+//			
+//		}
 		
-		public function get_request_from_timeline(vo:JukeBoxAPIVO):void{
-			
-		}
+//		public function get_request_from_timeline(vo:JukeBoxAPIVO):void{
+//			
+//		}
 		
 	}
 }

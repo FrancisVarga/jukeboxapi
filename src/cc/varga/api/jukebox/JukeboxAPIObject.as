@@ -6,6 +6,10 @@ package cc.varga.api.jukebox
 	public dynamic class JukeboxAPIObject extends ObjectProxy
 	{
 		public function JukeboxAPIObject(item:*){super(item);}
+
+   // override public toString(): String {
+
+   // }
 	}
 	
 }

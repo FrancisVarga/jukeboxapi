@@ -1,2 +1,6 @@
 *.swp
 *.swo
+tags
+bin/
+libs/
+bin-debug/

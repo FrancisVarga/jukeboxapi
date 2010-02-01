@@ -1,10 +1,12 @@
 package cc.varga.api.jukebox
 {
-	public interface IRESTful
+  import flash.events.IEventDispatcher;
+
+	public interface IRESTful extends IEventDispatcher
 	{
-		function get(vo:JukeboxAPIVO):void{}
-		function post(vo:JukeboxAPIVO):void{}
-		function delete(vo:JukeboxAPIVO):void{}
-		function put(vo:JukeboxAPIVO):void{}
+		function fetch():void
+		function post():void
+		function destroy():void
+		function put():void
 	}
 }
