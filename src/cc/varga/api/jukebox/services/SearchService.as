@@ -1,6 +1,6 @@
 package cc.varga.api.jukebox.services
 {
-	internal class SearchService extends AbstractService
+	internal class SearchService extends Resource
 	{
 		public function SearchService(vo:JukeboxAPIVO)
 		{

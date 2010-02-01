@@ -1,11 +1,11 @@
 package cc.varga.api.jukebox.services
 {
   import cc.varga.api.jukebox.*;
-  internal class BlipService extends AbstractService
+  internal class BlipService extends Resource
 	{
 		public function BlipService(vo:JukeboxAPIVO)
 		{
-      vo.type = JukeboxAPIVO.BLIP_TYPE
+      vo.type = JukeboxAPIVO.BLIP_TYPE;
 			super(vo);
 		}
 		

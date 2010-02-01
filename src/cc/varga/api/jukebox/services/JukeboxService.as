@@ -32,7 +32,7 @@ package cc.varga.api.jukebox.services
           break;
 				default : 
           Logger.log("Producing Generic Resource","JukeboxService");
-          service = new AbstractService(vo);
+          service = new Resource(vo);
 					break;
 			}
 			

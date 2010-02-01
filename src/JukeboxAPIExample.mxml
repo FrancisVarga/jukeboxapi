@@ -41,9 +41,9 @@
 //				trace("onSearchResult: " + event.result);
 //			}
 //			
-//			private function onFault(event : JukeboxAPIEvent):void{
-//				trace(event.fault.message);
-//			}
+			private function onFault(event : JukeboxAPIEvent):void{
+				trace(event.fault.message);
+			}
 //			
 //			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
 //				trace("onAlbumlistComplete: " + event.result);
