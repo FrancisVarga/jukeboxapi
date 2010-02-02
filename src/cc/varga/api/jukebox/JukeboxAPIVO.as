@@ -10,6 +10,7 @@ package cc.varga.api.jukebox
 		public static const SEARCH_TYPE : String = "search";
 		public static const BLIP_TYPE : String = "blip";
 		public static const BLIP_TIMELINE_TYPE:String = "blip/timeline";
+		public static const BLIP_REPLIES_TYPE:String = "blip/replies";
 		
 		public var host : String;
  //   public var crypto : Boolean;

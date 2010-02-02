@@ -28,6 +28,14 @@
         blip.faultCallback = onFault;
         blip.completeCallback = onBlipFeedResult;
         blip.fetch(); 
+
+        var searchVO:JukeboxAPIVO = new JukeboxAPIVO();
+        searchVO.type = JukeboxAPIVO.SEARCH_TYPE;
+        searchVO.data = {query: "BLA"};
+        var search:IRESTful = JukeboxService.createService(searchVO);
+        search.faultCallback = onFault;
+        search.completeCallback = onBlipFeedResult;
+        search.post();
 			}
 			
 //			private function onDownloadComplete(event : JukeboxAPIEvent):void{

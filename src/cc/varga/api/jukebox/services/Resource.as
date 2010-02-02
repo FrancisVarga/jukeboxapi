@@ -54,7 +54,13 @@ package cc.varga.api.jukebox.services
     }
 
     protected function get url():String{
-      return (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
+      var path:Array = [_vo.type];
+
+      if (_vo.path && _vo.path.length > 0) {
+        path = path.concat(_vo.path);
+      }
+
+      return (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+path.join("/")+".json";
     }
 
     protected function request(method:String, resultFunction:Function = null, data:* = null):URLLoader {
@@ -65,7 +71,7 @@ package cc.varga.api.jukebox.services
       basicService.addEventListener(Event.COMPLETE, resultFunction);
       basicService.addEventListener(IOErrorEvent.IO_ERROR, onIOError);
       request.method = method;
-      Logger.log(method+"-Request to "+url,"Resource")
+      Logger.log(request.method+"-Request to "+url,"Resource")
       basicService.load(request);
 
       return basicService;
