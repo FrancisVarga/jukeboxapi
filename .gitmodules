@@ -1,0 +1,6 @@
+[submodule ".\\libs\\as3HttpClient"]
+	path = .\\libs\\as3HttpClient
+	url = git@github.com:FrancisVarga/as3httpclient.git
+[submodule ".\\libs\\as3HTTPClient"]
+	path = .\\libs\\as3HTTPClient
+	url = git@github.com:FrancisVarga/as3httpclient.git
