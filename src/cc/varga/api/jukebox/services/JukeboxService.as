@@ -19,6 +19,7 @@ package cc.varga.api.jukebox.services
 			switch(vo.type){
 				case JukeboxAPIVO.BLIP_TIMELINE_TYPE:
           Logger.log("Producing BlipTimelineService","JukeboxService");
+          service = new BlipTimelineService(vo);
 					break;
 				case JukeboxAPIVO.BLIP_TYPE:
           Logger.log("Producing BlipService","JukeboxService");
@@ -26,9 +27,11 @@ package cc.varga.api.jukebox.services
 					break;
 				case JukeboxAPIVO.COLLECTION_TYPE:
           Logger.log("Producing CollectionService","JukeboxService");
+          service = new CollectionService(vo);
 					break;
 				case JukeboxAPIVO.SEARCH_TYPE:
           Logger.log("Producing SearchService","JukeboxService");
+          service = new SearchService(vo);
           break;
 				default : 
           Logger.log("Producing Generic Resource","JukeboxService");

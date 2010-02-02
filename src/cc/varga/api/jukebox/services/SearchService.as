@@ -1,5 +1,6 @@
 package cc.varga.api.jukebox.services
 {
+  import cc.varga.api.jukebox.*;
 	internal class SearchService extends Resource
 	{
 		public function SearchService(vo:JukeboxAPIVO)
