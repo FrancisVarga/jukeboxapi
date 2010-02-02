@@ -16,9 +16,9 @@ package cc.varga.api.jukebox.services
 
   internal class Resource extends EventDispatcher implements IRESTful
   {
-
-//    protected var serviceURL : String;
     protected var _vo : JukeboxAPIVO;
+    protected var _faultCallback : Function;
+    protected var _completeCallback : Function;
 
     public function Resource(vo:JukeboxAPIVO)
     {
@@ -45,11 +45,19 @@ package cc.varga.api.jukebox.services
       request("PUT", onPutComplete, JSON.encode(_vo.data));
     }
 
+    public function set faultCallback(callback : Function) : void {
+      _faultCallback = callback;
+    }
+
+    public function set completeCallback(callback : Function) : void {
+      _completeCallback = callback;
+    }
+
     protected function get url():String{
       return (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
     }
 
-    protected function request(method:String, resultFunction:Function = null, data:* = null):URLLoader{
+    protected function request(method:String, resultFunction:Function = null, data:* = null):URLLoader {
       var basicService : URLLoader = new URLLoader();	
       var request : URLRequest = new URLRequest(url);
 
@@ -65,46 +73,38 @@ package cc.varga.api.jukebox.services
 
     protected function onFetchComplete(event : Event):void {
       var data:Object = decodeJSON(event.currentTarget.data);
-      dispatchJukeEvent(JukeboxAPIEvent.FETCH_COMPLETE,data);
+      onCompleteCallback(data);
     }
     
     protected function onPostComplete(event : Event):void {
       var data:Object = decodeJSON(event.currentTarget.data);
-      dispatchJukeEvent(JukeboxAPIEvent.POST_COMPLETE,data);
+      onCompleteCallback(data);
     }
 
     protected function onDestroyComplete(event : Event):void {
-      dispatchJukeEvent(JukeboxAPIEvent.DESTROY_COMPLETE);
+      onCompleteCallback();
     }
 
     protected function onPutComplete(event : Event):void {
       var data:Object = decodeJSON(event.currentTarget.data);
-      dispatchJukeEvent(JukeboxAPIEvent.PUT_COMPLETE,data);
+      onCompleteCallback(data);
     }
 
-		protected function onIOError(event : IOErrorEvent):void{dispatchJukeEvent(JukeboxAPIEvent.FAULT, null, event); }
+		protected function onIOError(event : IOErrorEvent) : void { _faultCallback(_vo); }
 
-    private function dispatchJukeEvent(type:String, result:* = null, fault:* = null):void
+    private function onCompleteCallback(data:* = null):void
     {
-      var jukeEvent : JukeboxAPIEvent = new JukeboxAPIEvent(type);
-
-
       // Omitting result AND fault resets _vo.data to null
-      if(result) {
+      if(data) {
         Logger.log("Adding ValueObject to result", "JukeEventDispatch");
-        _vo.data = result;
-        jukeEvent.result = _vo;
-      }
-      else if (fault) {
-        jukeEvent.fault = {"message":fault.toString()};
+        _vo.data = data;
       }
       else {
         Logger.log("Adding ValueObject to result with nullified Data", "JukeEventDispatch");
         _vo.data = null;
-        jukeEvent.result = _vo;
       }
 
-      dispatchEvent(jukeEvent);
+      _completeCallback(_vo);
     }
 
     private function decodeJSON(result:*):*

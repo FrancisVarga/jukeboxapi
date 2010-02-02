@@ -8,5 +8,8 @@ package cc.varga.api.jukebox
 		function post():void
 		function destroy():void
 		function put():void
+
+    function set faultCallback(callback : Function) : void;
+    function set completeCallback(callback : Function) : void;
 	}
 }

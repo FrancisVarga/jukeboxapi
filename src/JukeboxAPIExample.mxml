@@ -14,6 +14,7 @@
 			import cc.varga.api.jukebox.*;
 			import cc.varga.utils.Logger;
 			import mx.events.FlexEvent;
+			import mx.controls.Alert;
 
 			private var service : JukeboxService;
 			
@@ -24,8 +25,8 @@
         vo.type = JukeboxAPIVO.BLIP_TYPE;
 
         var blip:IRESTful = JukeboxService.createService(vo);
-        blip.addEventListener(JukeboxAPIEvent.FETCH_COMPLETE, onBlipFeedResult);
-        blip.addEventListener(JukeboxAPIEvent.FAULT, onFault);
+        blip.faultCallback = onFault;
+        blip.completeCallback = onBlipFeedResult;
         blip.fetch(); 
 			}
 			
@@ -41,8 +42,8 @@
 //				trace("onSearchResult: " + event.result);
 //			}
 //			
-			private function onFault(event : JukeboxAPIEvent):void{
-				trace(event.fault.message);
+			private function onFault(vo : JukeboxAPIVO):void{
+        Alert.show("Fault: "+vo);
 			}
 //			
 //			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
@@ -53,8 +54,7 @@
 //				trace("onArtistListComplete" + event.result);	
 //			}
 			
-			private function onBlipFeedResult(event : JukeboxAPIEvent):void{
-        var vo:JukeboxAPIVO = event.result as JukeboxAPIVO;
+			private function onBlipFeedResult(vo : JukeboxAPIVO):void{
 				trace("onBlipFeedResult" + vo.data);
         for (var i:int = 0; i < vo.data.length; i++) {
           Logger.log((vo.data[i] as JukeboxAPIObject).title,"Blip");
