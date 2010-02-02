@@ -20,7 +20,7 @@ package cc.varga.api.jukebox
 		public function JukeboxAPIVO(item:Object=null, host:String = "localhost")
 		{
 			super(item, null, -1);
-      this.host = host;
+      		this.host = host;
 		}
 	}
 }

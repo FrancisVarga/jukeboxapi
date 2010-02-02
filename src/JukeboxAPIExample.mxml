@@ -15,53 +15,43 @@
 			import cc.varga.utils.Logger;
 			import mx.events.FlexEvent;
 			import mx.controls.Alert;
-
+			
 			private var service : JukeboxService;
 			
 			protected function application1_creationCompleteHandler(event:FlexEvent):void
 			{
-        var vo:JukeboxAPIVO = new JukeboxAPIVO();
-        vo.path = ["blipfm"];
-        vo.type = JukeboxAPIVO.BLIP_TYPE;
-
-        var blip:IRESTful = JukeboxService.createService(vo);
-        blip.faultCallback = onFault;
-        blip.completeCallback = onBlipFeedResult;
-        blip.fetch(); 
+				
+				var vo:JukeboxAPIVO = new JukeboxAPIVO(null, "iris");
+				vo.path = ["LittleBuddha87"];
+				vo.type = JukeboxAPIVO.BLIP_TYPE;
+				
+				var blip:IRESTful = JukeboxService.createService(vo);
+				blip.faultCallback = onFault;
+				blip.completeCallback = onBlipFeedResult;
+				blip.fetch(); 
+				
 			}
-			
-//			private function onDownloadComplete(event : JukeboxAPIEvent):void{
-//				trace("onDownloadComplete" + event.result);
-//			}
-//			
-//			private function onTracksComplete(event : JukeboxAPIEvent):void{
-//				trace("onTracksComplete: " + event.result);
-//			}
-//			
-//			private function onSearchResult(event : JukeboxAPIEvent):void{
-//				trace("onSearchResult: " + event.result);
-//			}
-//			
+	
 			private function onFault(vo : JukeboxAPIVO):void{
-        Alert.show("Fault: "+vo);
+				Alert.show("Fault: "+vo);
 			}
-//			
-//			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
-//				trace("onAlbumlistComplete: " + event.result);
-//			}
-//			
-//			private function onArtistListComplete(event : JukeboxAPIEvent):void{
-//				trace("onArtistListComplete" + event.result);	
-//			}
+			//			
+			//			private function onAlbumlistComplete(event : JukeboxAPIEvent):void{
+			//				trace("onAlbumlistComplete: " + event.result);
+			//			}
+			//			
+			//			private function onArtistListComplete(event : JukeboxAPIEvent):void{
+			//				trace("onArtistListComplete" + event.result);	
+			//			}
 			
 			private function onBlipFeedResult(vo : JukeboxAPIVO):void{
 				trace("onBlipFeedResult" + vo.data);
-        for (var i:int = 0; i < vo.data.length; i++) {
-          Logger.log((vo.data[i] as JukeboxAPIObject).title,"Blip");
-          
-        }
+				for (var i:int = 0; i < vo.data.length; i++) {
+					Logger.log((vo.data[i] as JukeboxAPIObject).title,"Blip");
+					
+				}
 			}
-
+			
 		]]>
 	</fx:Script>
 	
@@ -70,4 +60,4 @@
 	</fx:Declarations>
 	
 </s:Application>
- 
+

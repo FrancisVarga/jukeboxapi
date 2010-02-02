@@ -5,7 +5,7 @@ package cc.varga.api.jukebox.services
 	{
 		public function BlipService(vo:JukeboxAPIVO)
 		{
-      vo.type = JukeboxAPIVO.BLIP_TYPE;
+      		vo.type = JukeboxAPIVO.BLIP_TYPE;
 			super(vo);
 		}
 		
