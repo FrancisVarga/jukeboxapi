@@ -12,6 +12,7 @@ package cc.varga.api.jukebox.services
 	
 	import org.httpclient.*;
 	import org.httpclient.events.*;
+	import org.httpclient.events.HTTPStatusEvent;
 	
 	internal class Resource extends EventDispatcher implements IRESTful
 	{
@@ -82,6 +83,7 @@ package cc.varga.api.jukebox.services
 			listener.onRequest = function(data:*):void{
 				Logger.log("onRequest", "Ressource");
 			}
+      listener.onStatus = onStatusHandler;
 				
 			listener.onData = resultFunction;
 				
@@ -126,6 +128,17 @@ package cc.varga.api.jukebox.services
 		protected function onPutComplete(response : *):void {
 			invokeCallbackFunction(response);
 		}
+
+    /* This Method has to stop invocations of complete Handlers for the client
+     * if we get a non-success response status (e.g. 4xx or 5xx)
+     */
+    protected function onStatusHandler(statusEvent: org.httpclient.events.HTTPStatusEvent) : void {
+      if (statusEvent.response.isClientError || statusEvent.response.isServerError) {
+        Logger.log("The Request encountered an Error "+statusEvent.response.message,"HTTP Error");
+        statusEvent.currentTarget.listener.onData = null;
+      }
+      
+    }
 		
 		protected function onIOError(event : *) : void { _faultCallback(_vo); }
 		

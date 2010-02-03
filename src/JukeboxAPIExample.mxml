@@ -18,33 +18,50 @@
 			protected function application1_creationCompleteHandler(event:FlexEvent):void
 			{
 				
-				var vo:JukeboxAPIVO = new JukeboxAPIVO(null, "iris");
+        // Fetching Blip Feed
+        var vo:JukeboxAPIVO = new JukeboxAPIVO(null);
 				vo.path = ["LittleBuddha87"];
 				vo.type = JukeboxAPIVO.BLIP_TYPE;
 				
 				var blip:IRESTful = JukeboxService.createService(vo);
 				blip.faultCallback = onFault;
 				blip.completeCallback = onBlipFeedResult;
-				//blip.fetch();
-				
-				var searchVO : JukeboxAPIVO = new JukeboxAPIVO(null, "iris");
+				blip.fetch();
+
+        // Searching for 'Madonna'
+				var searchVO : JukeboxAPIVO = new JukeboxAPIVO(null);
 				searchVO.type = JukeboxAPIVO.SEARCH_TYPE;
 				searchVO.data = {query:"Madonna"};
 				var search : IRESTful = JukeboxService.createService(searchVO);
+				search.faultCallback = onFault;
+				search.completeCallback = onBlipFeedResult;
 				search.post();
-				
+
+        // Find Collection
+        var collectionVO : JukeboxAPIVO = new JukeboxAPIVO();
+        collectionVO.type = JukeboxAPIVO.COLLECTION_TYPE;
+        collectionVO.path = [1];
+        var collection : IRESTful = JukeboxService.createService(collectionVO);
+        collection.faultCallback = onFault;
+        collection.completeCallback = onCollectionResult;
+        collection.fetch();
 			}
 	
 			private function onFault(vo : JukeboxAPIVO):void{
 				Alert.show("Fault: "+vo);
 			}
-						private function onBlipFeedResult(vo : JukeboxAPIVO):void{
+
+		  private function onBlipFeedResult(vo : JukeboxAPIVO):void{
 				trace("onBlipFeedResult" + vo.data);
 				for (var i:int = 0; i < vo.data.length; i++) {
 					Logger.log((vo.data[i] as JukeboxAPIObject).title,"Blip");
 					
 				}
 			}
+
+      private function onCollectionResult(vo : JukeboxAPIVO) : void {
+        Logger.log("encountered Collection Result" + vo.data, "Collection");
+      }
 			
 		]]>
 	</fx:Script>

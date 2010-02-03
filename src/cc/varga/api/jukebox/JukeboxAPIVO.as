@@ -13,6 +13,8 @@ package cc.varga.api.jukebox
 		public static const BLIP_REPLIES_TYPE:String = "blip/replies";
 
 		public var      host:String;
+    private var _data: *;
+
               //public var crypto:                Boolean;
               //public var path:                Array;
               //public var type:                String;
