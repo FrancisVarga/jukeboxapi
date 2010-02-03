@@ -21,7 +21,7 @@ package cc.varga.api.jukebox
 			var service : HTTPService = new HTTPService();
 			service.addEventListener(FaultEvent.FAULT, onFault);
 			service.addEventListener(ResultEvent.RESULT, onResult);
-			service.url = "serverconfig.json";
+			service.url = "serverConfig.json";
 			service.send();
 		}
 		
