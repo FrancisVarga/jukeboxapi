@@ -1,18 +1,17 @@
 package cc.varga.api.jukebox.services
 {
 	import cc.varga.api.jukebox.*;
-	import cc.varga.utils.Logger;
+	import cc.varga.utils.*;
 	
-	import com.adobe.net.URI;
-	import com.adobe.serialization.json.JSON;
+	import com.adobe.net.*;
+	import com.adobe.serialization.json.*;
 	
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
+	import flash.events.*;
 	import flash.net.URLRequestMethod;
-	import flash.utils.ByteArray;
+	import flash.utils.*;
 	
-	import org.httpclient.HTTPClient;
-	import org.httpclient.events.HTTPListener;
+	import org.httpclient.*;
+	import org.httpclient.events.*;
 	
 	internal class Resource extends EventDispatcher implements IRESTful
 	{
@@ -30,16 +29,17 @@ package cc.varga.api.jukebox.services
 			request(URLRequestMethod.GET, onFetchComplete).fetch(new URI(url));
 		}
 		
-		public function post() : void { 
-			request(URLRequestMethod.POST, onPostComplete, {}).post(new URI(url), JSON.encode(_vo.data)) ; 
+		public function post() : void {
+			Logger.log("POST: " + _vo.data.toString(), "RESSOURCE");
+			request(URLRequestMethod.POST, onPostComplete, {}).post(new URI(url), generateData(JSON.encode(_vo.data))) ; 
 		}
 		
 		public function destroy() : void { 
-			request("DELETE", onDestroyComplete); 
+			request("DELETE", onDestroyComplete).del(new URI(url)); 
 		}
 		
 		public function put() : void {
-			request("PUT", onPutComplete, {}).put(new URI(url), JSON.encode(_vo.data)) ;
+			request("PUT", onPutComplete, {}).put(new URI(url), generateData(JSON.encode(_vo.data))) ;
 		}
 		
 		public function set faultCallback(callback : Function) : void {
@@ -51,7 +51,13 @@ package cc.varga.api.jukebox.services
 		}
 		
 		protected function get url() : String {
-			return (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
+			var urlString : String;
+			if(_vo.path){
+				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
+			} else {
+				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type]+".json";
+			}
+			return urlString;
 		}
 		
 		protected function request(method : String, resultFunction : Function = null, data : * = null) : HTTPClient {
@@ -90,9 +96,16 @@ package cc.varga.api.jukebox.services
 			
 		}
 		
+		private function generateData(value:String):ByteArray{
+			Logger.log("Data to send: " + value, "Ressource");
+			var data : ByteArray = new ByteArray();
+			data.writeUTFBytes(value);
+			return data;
+		}
+		
 		// This function convert ByteArray to JSON
 		private function invokeCallbackFunction(data:*):void{
-			onCompleteCallback(decodeJSON(ByteArray(data).readUTFBytes(ByteArray(data).length)));
+			onCompleteCallback(decodeJSON(ByteArray(data.bytes).readUTFBytes(ByteArray(data.bytes).length)));
 		}
 		
 		protected function onFetchComplete(response : *):void {

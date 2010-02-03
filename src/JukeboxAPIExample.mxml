@@ -6,15 +6,12 @@
 			   xmlns:flexui="flexunit.flexui.*" >
 	<fx:Script>
 		<![CDATA[
-			import com.adobe.serialization.json.JSON;
-			import mx.rpc.events.FaultEvent;
-			import cc.varga.api.jukebox.JukeboxAPIEvent;
-			import cc.varga.api.jukebox.JukeboxAPIVO;
-			import cc.varga.api.jukebox.services.JukeboxService;
 			import cc.varga.api.jukebox.*;
+			import cc.varga.api.jukebox.services.JukeboxService;
 			import cc.varga.utils.Logger;
-			import mx.events.FlexEvent;
+			
 			import mx.controls.Alert;
+			import mx.events.FlexEvent;
 			
 			private var service : JukeboxService;
 			
@@ -28,7 +25,13 @@
 				var blip:IRESTful = JukeboxService.createService(vo);
 				blip.faultCallback = onFault;
 				blip.completeCallback = onBlipFeedResult;
-				blip.fetch(); 
+				//blip.fetch();
+				
+				var searchVO : JukeboxAPIVO = new JukeboxAPIVO(null, "iris");
+				searchVO.type = JukeboxAPIVO.SEARCH_TYPE;
+				searchVO.data = {query:"Madonna"};
+				var search : IRESTful = JukeboxService.createService(searchVO);
+				search.post();
 				
 			}
 	

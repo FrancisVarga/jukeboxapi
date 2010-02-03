@@ -15,12 +15,21 @@ package cc.varga.api.jukebox
  //   public var crypto : Boolean;
  //   public var path : Array;
  // 	public var type : String;
- //   public var data : Object;
+ 	   private var _data : *;
 		
 		public function JukeboxAPIVO(item:Object=null, host:String = "localhost")
 		{
 			super(item, null, -1);
       		this.host = host;
 		}
+		
+		public function set data(value : *) : void{
+			_data = value;
+		}
+		
+		public function get data():*{
+			return _data;
+		}
+		
 	}
 }
