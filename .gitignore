@@ -5,3 +5,4 @@ tags
 bin/
 libs/
 bin-debug/
+src/serverConfig.json
