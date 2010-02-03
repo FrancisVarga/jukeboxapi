@@ -26,6 +26,8 @@ end
 desc 'Compile and debug the application'
 debug :debug do |m|
   m.prepended_args = "-debug=true"
+  m.source_path << "libs/as3HttpClient/src/"
+  m.include_libraries << "libs/as3HttpClient/lib/as3crypto-1_3_patched.swc"
 end
 
 desc 'Compile run the test harness'
@@ -48,3 +50,5 @@ ci :cruise
 
 # set up the default rake task
 task :default => :debug
+
+#mxmlc -debug=true -default-background-color=#FFFFFF -default-frame-rate=24 -default-size 970 550 -library-path+=libs/corelib.swc -source-path+=libs/as3HttpClient/src -output=bin/JukeboxAPIExample-debug.swf -source-path+=src -verbose-stacktraces=true -warnings=true src/JukeboxAPIExample.mxml
