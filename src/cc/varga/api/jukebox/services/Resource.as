@@ -12,7 +12,6 @@ package cc.varga.api.jukebox.services
 	
 	import org.httpclient.*;
 	import org.httpclient.events.*;
-	import org.httpclient.events.HTTPStatusEvent;
 	
 	internal class Resource extends EventDispatcher implements IRESTful
 	{
@@ -21,8 +20,7 @@ package cc.varga.api.jukebox.services
 		protected var _completeCallback : Function;
 		private var restfulClient : HTTPClient;
 		
-		public function Resource(vo:JukeboxAPIVO)
-		{
+		public function Resource(vo:JukeboxAPIVO){
 			_vo = vo;
 		}
 		
@@ -54,10 +52,12 @@ package cc.varga.api.jukebox.services
 		protected function get url() : String {
 			var urlString : String;
 			if(_vo.path){
-				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
+				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.serverConfig.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
 			} else {
-				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.host+"/"+[_vo.type]+".json";
+				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.serverConfig.host+"/"+[_vo.type]+".json";
 			}
+			
+			Logger.log("URL Service: " + urlString, "Resource");
 			return urlString;
 		}
 		
@@ -163,7 +163,6 @@ package cc.varga.api.jukebox.services
 			var arryList : Array = new Array();
 			
 			for(var i:uint=0; i < resultObj.length; i++){
-				Logger.log("Producing JukeboxAPIObject from JSON-Result","Resource");
 				arryList.push(new JukeboxAPIObject(resultObj[i]));
 			}
 			
