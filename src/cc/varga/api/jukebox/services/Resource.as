@@ -2,6 +2,7 @@ package cc.varga.api.jukebox.services
 {
 	import cc.varga.api.jukebox.*;
 	import cc.varga.utils.*;
+  import cc.lmaa.yajl.Yajl;
 	
 	import com.adobe.net.*;
 	import com.adobe.serialization.json.*;
@@ -19,6 +20,10 @@ package cc.varga.api.jukebox.services
 		protected var _faultCallback : Function;
 		protected var _completeCallback : Function;
 		private var restfulClient : HTTPClient;
+    private var _format : String = ".json";
+    private var _chunks : Array = [];
+    private var _decoderId : int;
+    private var _resumeDecodeOnData : Boolean = false;
 		
 		public function Resource(vo:JukeboxAPIVO){
 			_vo = vo;
@@ -44,17 +49,32 @@ package cc.varga.api.jukebox.services
 		public function set faultCallback(callback : Function) : void {
 			_faultCallback = callback;
 		}
+
+
+    private function get format() : String {
+      if(_vo.format != null) {
+        return _vo.format;
+      }
+      else {
+        return _format;
+      }
+    }
 		
 		public function set completeCallback(callback : Function) : void {
 			_completeCallback = callback;
 		}
 		
 		protected function get url() : String {
+      // FIXME: Should use corelib's URI class for URLs
+      //var uri:URI = new URI(proto+"://"+_vo.serverConfig.host);
+
+      var proto:String = (_vo.crypto ? "https" : "http");
+      var host:String = _vo.serverConfig.host;
 			var urlString : String;
 			if(_vo.path){
-				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.serverConfig.host+"/"+[_vo.type].concat(_vo.path).join("/")+".json";
+				urlString = proto+"://"+host+"/"+[_vo.type].concat(_vo.path).join("/")+format;
 			} else {
-				urlString = (_vo.crypto ? "https" : "http")+"://"+_vo.serverConfig.host+"/"+[_vo.type]+".json";
+				urlString = proto+"://"+host+"/"+[_vo.type]+format;
 			}
 			
 			Logger.log("URL Service: " + urlString, "Resource");
@@ -106,8 +126,22 @@ package cc.varga.api.jukebox.services
 		}
 		
 		// This function convert ByteArray to JSON
-		private function invokeCallbackFunction(data:*):void{
-			onCompleteCallback(decodeJSON(ByteArray(data.bytes).readUTFBytes(ByteArray(data.bytes).length)));
+		private function invokeCallbackFunction(data:*) : void {
+      var response : String = ByteArray(data.bytes).readUTFBytes(ByteArray(data.bytes).length);
+      if(!_decoderId) {
+        _decoderId = Yajl.setupStreamDecoder();
+        decodeJSONChunk(response);
+      }
+      else {
+        if(_resumeDecodeOnData) {
+          decodeJSONChunk(response);
+          _resumeDecodeOnData = false;
+        }
+        else {
+          _chunks.push(response);
+        }
+      }
+//			onCompleteCallback(decodeJSON());
 		}
 		
 		protected function onFetchComplete(response : *):void {
@@ -156,18 +190,43 @@ package cc.varga.api.jukebox.services
 			
 			_completeCallback(_vo);
 		}
-		
-		private function decodeJSON(result:*):*
-		{ 			
-			var resultObj : Object = JSON.decode(result);
-			var arryList : Array = new Array();
-			
-			for(var i:uint=0; i < resultObj.length; i++){
-				arryList.push(new JukeboxAPIObject(resultObj[i]));
-			}
-			
-			return arryList;
-		}
-		
-	}
+
+    private function getMoreChunks(result : *) : void {
+      if(result == undefined) {
+        if(_chunks.length > 0) {
+          decodeJSONChunk(_chunks.shift());
+        }
+        else {
+          _resumeDecodeOnData = true;
+        }
+      }
+      else {
+        if(result.error != null) {
+          Logger.log("Error encountered","Resource::Yajl");
+          throw new Error(result.error);
+        }
+        else {
+          Logger.log("Parsing seems complete","Resource::Yajl");
+          onCompleteCallback(result.result);
+        }
+      }
+    }
+
+    private function decodeJSONChunk(chunk : String) : void {
+      Yajl.decodeStreamAsync(getMoreChunks,_decoderId, chunk);
+    }
+
+    private function decodeJSON(result:*):*
+    { 			
+      var resultObj : Object = JSON.decode(result);
+      var arryList : Array = new Array();
+
+      for(var i:uint=0; i < resultObj.length; i++){
+        arryList.push(new JukeboxAPIObject(resultObj[i]));
+      }
+
+      return arryList;
+    }
+
+  }
 }

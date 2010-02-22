@@ -31,8 +31,8 @@ compile :debug => :model do |m|
   m.include_libraries << "libs/as3HttpClient/lib/as3crypto-1_3_patched.swc"
 end
 
-desc 'Compile run the test harness'
-unit :test
+#desc 'Compile run the test harness'
+#unit :test
 
 desc 'Compile the optimized deployment'
 deploy :deploy
@@ -52,9 +52,6 @@ desc 'Compile a SWC file'
 swc :swc do |m|
   m.include_classes << "cc.varga.api.jukebox.JukeboxAPI"
 end
-
-desc 'Compile and run the test harness for Ci'
-ci :cruise
 
 # set up the default rake task
 task :default => :debug
